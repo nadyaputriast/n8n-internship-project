@@ -1,0 +1,906 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "47abfd08-eb90-4e29-9901-14a4338b8cf1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2b582691-ebb9-42c8-bdc0-09fd0b2e5f7b",
+      "name": "Webhook",
+      "webhookId": "47abfd08-eb90-4e29-9901-14a4338b8cf1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.fonnte.com/send",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "authorization",
+              "value": "3ssevwCHZUrLwZarm9bN"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message",
+              "value": "={{ $json.output }}"
+            },
+            {
+              "name": "target",
+              "value": "={{ $('Code2').item.json.no_telp }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1136,
+        0
+      ],
+      "id": "b66ef7a9-3b47-4b21-a291-a16c4542e0fe",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        736,
+        192
+      ],
+      "id": "8869e69d-64d9-413f-852e-ff50b763eabb",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "ZEDkRMOzRtY8GSR5",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-large",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        368,
+        224
+      ],
+      "id": "dadd6ff7-5e76-4e79-8f1d-7bcdcb93d57a",
+      "name": "Embeddings OpenAI3",
+      "credentials": {
+        "openAiApi": {
+          "id": "ZEDkRMOzRtY8GSR5",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "=define",
+        "text": "=Pertanyaan: {{ $json.text }} \\nContext: {{ $json.combinedContext }}",
+        "options": {
+          "systemMessage": "=📝 Prompt untuk AI Agent (Panitia Workshop Assistant)\n\nPERAN:\nAnda adalah Panitia Workshop Assistant.\n\nATURAN TANGGAL:\n\nNormalisasi semua format tanggal ke YYYY-MM-DD.\n\nContoh: 7/12/2025 → 2025-12-07\n\nContoh: 8/9/2025 → 2025-09-08\n\nSaat menampilkan workshop, hanya tampilkan workshop dengan tanggal ≥ {{ $now.format('YYYY-MM-DD') }}.\n\nUrutkan workshop dari tanggal terdekat ke terjauh.\n\nOUTPUT WORKSHOP (format wajib):\n\n• Nama Workshop (YYYY-MM-DD)\n• Nama Workshop (YYYY-MM-DD)\n\nPENDAFTARAN:\n\nSemua pendaftaran dilakukan langsung melalui sistem ini.\n\nJangan pernah menyarankan peserta untuk menghubungi pihak lain.\n\nPENGUMPULAN DATA PESERTA:\nJika peserta memberikan data diri, kumpulkan SEMUA atribut dalam satu jawaban dengan format JSON berikut:\n\n{\n  \"Nama Lengkap\": \"...\",\n  \"Email\": \"...\",\n  \"Alamat\": \"...\",\n  \"Kampus\": \"...\",\n  \"Nomor Telepon\": \"...\",\n  \"Workshop\": \"...\"\n}\n\nJangan menyimpan data satu per satu.\nJangan ubah struktur JSON.\n\nCATATAN PENTING:\n\nJawab hanya sesuai peran (Panitia Workshop Assistant).\nJangan halusinasi workshop (hanya tampilkan jika ada di input).\n\nGunakan format yang ditentukan secara konsisten."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        752,
+        0
+      ],
+      "id": "b1dddf3b-ca1b-45a7-85ec-d54fe77047ce",
+      "name": "AI Agent3"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1xaGYjBd6pybVqNS7kEFlVPC5uZHwVTenpR_J3h5HEHQ",
+          "mode": "list",
+          "cachedResultName": "Ngetes Workshop",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xaGYjBd6pybVqNS7kEFlVPC5uZHwVTenpR_J3h5HEHQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1823034107,
+          "mode": "list",
+          "cachedResultName": "Pendaftar",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xaGYjBd6pybVqNS7kEFlVPC5uZHwVTenpR_J3h5HEHQ/edit#gid=1823034107"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "No": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('No', ``, 'string') }}",
+            "TimeStamp": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('TimeStamp', ``, 'string') }}",
+            "Nama": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Nama', ``, 'string') }}",
+            "Email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Email', ``, 'string') }}",
+            "Alamat": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Alamat', ``, 'string') }}",
+            "kampus": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('kampus', ``, 'string') }}",
+            "Nomor Telepon": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Nomor_Telepon', ``, 'string') }}",
+            "Workshop": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Workshop', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "No",
+              "displayName": "No",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "TimeStamp",
+              "displayName": "TimeStamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nama",
+              "displayName": "Nama",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Alamat",
+              "displayName": "Alamat",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "kampus",
+              "displayName": "kampus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nomor Telepon",
+              "displayName": "Nomor Telepon",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Workshop",
+              "displayName": "Workshop",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        1008,
+        224
+      ],
+      "id": "d882fb8a-fc2a-4e8e-b345-8b92ef10ec19",
+      "name": "Append row in sheet in Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "oMk2jD1MrCuJt7Oj",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "load",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "workshop-index",
+          "mode": "list",
+          "cachedResultName": "workshop-index"
+        },
+        "prompt": "={{ $('Webhook').item.json.body.pesan }}",
+        "topK": 20,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "732db6f8-7493-4230-bc91-c9b92c3163c8",
+      "name": "Pinecone Vector Store3",
+      "credentials": {
+        "pineconeApi": {
+          "id": "W0kzKeIkO3RgLWTD",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Code2').item.json.no_telp }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        864,
+        320
+      ],
+      "id": "e0998eda-de61-41dc-959c-4c2d6f0b7e56",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Ambil input dari n8n (pastikan array)\nconst input = $input.all();\nconst docs = Array.isArray(input) ? input.map(i => i.json) : [input?.json || {}];\n\n// --- Ambil no_telp & text dari item trigger (biasanya item pertama) ---\nconst no_telp = $('Webhook').first().json.body.sender;\nconst text = $('Webhook').first().json.body.message;\n\n// --- Parsing hasil dari Pinecone docs ---\nlet generalKnowledge = '';\nconst workshops = [];\n\ndocs.forEach(item => {\n  try {\n    const textDoc = item.document?.pageContent || '';\n    if (!textDoc) return;\n\n    // Kalau teks panjang (FAQ/general info)\n    if (textDoc.includes(\"FAQ Workshop Tech Series\") || textDoc.includes(\"📅 Informasi Umum\")) {\n      generalKnowledge += textDoc + \"\\n\";\n    } else {\n      // Parsing workshop data\n      const nama = textDoc.split(',')[0]?.trim() || \"Workshop Tanpa Nama\";\n      const kapasitas = textDoc.match(/kapasitas:\\s*(\\d+)/i)?.[1] || \"N/A\";\n      let tanggal = textDoc.match(/tanggal pelaksanaan:\\s*([\\d/]+)/i)?.[1]?.trim() || \"\";\n\n      // Normalisasi dd/mm/yyyy → yyyy-mm-dd\n      if (tanggal && tanggal.includes('/')) {\n        const [day, month, year] = tanggal.split('/');\n        if (day && month && year) {\n          tanggal = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;\n        }\n      }\n\n      workshops.push({ nama, kapasitas, tanggal });\n    }\n  } catch (err) {\n    console.error(\"Error parsing doc:\", err);\n  }\n});\n\n// Filter workshop aktif (≥ hari ini)\nconst today = new Date().toISOString().split(\"T\")[0];\nconst activeWorkshops = workshops.filter(ws => ws.tanggal && ws.tanggal >= today);\n\n// Urutkan by tanggal\nactiveWorkshops.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));\n\n// Gabungkan hasil\nconst combinedContext = `\n**INFORMASI UMUM**:\n${generalKnowledge ? generalKnowledge.substring(0, 500) + \"... [informasi lengkap tersedia]\" : \"Tidak ada informasi umum.\"}\n\n**WORKSHOP TERDEKAT**:\n${activeWorkshops.length > 0 \n  ? activeWorkshops.map(ws => `• ${ws.nama} (${ws.tanggal}) - Kuota: ${ws.kapasitas}`).join('\\n') \n  : \"Tidak ada workshop aktif.\"}\n`;\n\n// --- Kembalikan output sebagai 1 item saja ---\nreturn [{\n  no_telp,\n  text,\n  combinedContext,\n  detailedWorkshops: activeWorkshops\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ],
+      "id": "1a498b47-3e98-4881-98b1-b4813b682f42",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1xaGYjBd6pybVqNS7kEFlVPC5uZHwVTenpR_J3h5HEHQ",
+          "mode": "list",
+          "cachedResultName": "Ngetes Workshop",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xaGYjBd6pybVqNS7kEFlVPC5uZHwVTenpR_J3h5HEHQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1847054469,
+          "mode": "list",
+          "cachedResultName": "MasterWorkshop",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xaGYjBd6pybVqNS7kEFlVPC5uZHwVTenpR_J3h5HEHQ/edit#gid=1847054469"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        32,
+        544
+      ],
+      "id": "72cb82cf-f9de-4c83-bb8f-35461a4f299f",
+      "name": "MasterWorkshop Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "FC6QnzWxwWrHbZXL",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1xaGYjBd6pybVqNS7kEFlVPC5uZHwVTenpR_J3h5HEHQ",
+          "mode": "list",
+          "cachedResultName": "Ngetes Workshop",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xaGYjBd6pybVqNS7kEFlVPC5uZHwVTenpR_J3h5HEHQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1823034107,
+          "mode": "list",
+          "cachedResultName": "Pendaftar",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xaGYjBd6pybVqNS7kEFlVPC5uZHwVTenpR_J3h5HEHQ/edit#gid=1823034107"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        16,
+        816
+      ],
+      "id": "05bb25ba-98e5-402f-8b5c-08a19728fd94",
+      "name": "Pendaftar Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "FC6QnzWxwWrHbZXL",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "documentId": {
+          "__rl": true,
+          "value": "1xaGYjBd6pybVqNS7kEFlVPC5uZHwVTenpR_J3h5HEHQ",
+          "mode": "list",
+          "cachedResultName": "Ngetes Workshop",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xaGYjBd6pybVqNS7kEFlVPC5uZHwVTenpR_J3h5HEHQ/edit?usp=drivesdk"
+        },
+        "title": "={{ $json.Workshop }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        240,
+        544
+      ],
+      "id": "57b7cce2-f5bf-4ab0-bc99-7184d34437ca",
+      "name": "Create New Workshop Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "oMk2jD1MrCuJt7Oj",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1xaGYjBd6pybVqNS7kEFlVPC5uZHwVTenpR_J3h5HEHQ",
+          "mode": "list",
+          "cachedResultName": "Ngetes Workshop",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xaGYjBd6pybVqNS7kEFlVPC5uZHwVTenpR_J3h5HEHQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $json.Workshop }}",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "No": "No",
+            "TimeStamp": "TimeStamp",
+            "Nama": "Nama",
+            "Email": "Email",
+            "Alamat": "Alamat",
+            "kampus": "kampus",
+            "Nomor Telepon": "Nomor Telepon",
+            "Kehadiran": "Kehadiran"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        512,
+        544
+      ],
+      "id": "2bd648d3-fa59-4754-9673-a50722173a07",
+      "name": "Add Headers to New Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "oMk2jD1MrCuJt7Oj",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentId": {
+          "__rl": true,
+          "value": "1xaGYjBd6pybVqNS7kEFlVPC5uZHwVTenpR_J3h5HEHQ",
+          "mode": "list",
+          "cachedResultName": "Ngetes Workshop",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xaGYjBd6pybVqNS7kEFlVPC5uZHwVTenpR_J3h5HEHQ/edit?usp=drivesdk"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        272,
+        816
+      ],
+      "id": "336315e6-14ef-4f71-815a-f790322e0842",
+      "name": "Get Master Workshops",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "oMk2jD1MrCuJt7Oj",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "workshop-exists-check",
+              "leftValue": "={{ $('Get Master Workshops').all().some(workshop => workshop.json.Workshop === $json.Workshop) }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        544,
+        816
+      ],
+      "id": "39c468dd-354f-4633-9f5e-fd88a11f5646",
+      "name": "Check Workshop Exists"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1xaGYjBd6pybVqNS7kEFlVPC5uZHwVTenpR_J3h5HEHQ",
+          "mode": "list",
+          "cachedResultName": "Ngetes Workshop",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xaGYjBd6pybVqNS7kEFlVPC5uZHwVTenpR_J3h5HEHQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $json.Workshop }}",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "No": "={{ $json.No }}",
+            "TimeStamp": "={{ $json.TimeStamp }}",
+            "Nama": "={{ $json.Nama }}",
+            "Email": "={{ $json.Email }}",
+            "Alamat": "={{ $json.Alamat }}",
+            "kampus": "={{ $json.kampus }}",
+            "Nomor Telepon": "={{ $json['Nomor Telepon'] }}",
+            "Kehadiran": ""
+          },
+          "matchingColumns": [
+            "No"
+          ],
+          "schema": [
+            {
+              "id": "No",
+              "displayName": "No",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "TimeStamp",
+              "displayName": "TimeStamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Nama",
+              "displayName": "Nama",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Alamat",
+              "displayName": "Alamat",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "kampus",
+              "displayName": "kampus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Nomor Telepon",
+              "displayName": "Nomor Telepon",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Kehadiran",
+              "displayName": "Kehadiran",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        800,
+        688
+      ],
+      "id": "25b14ea5-4fce-49b3-8618-ebd3676fbc8e",
+      "name": "Append to Workshop Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "oMk2jD1MrCuJt7Oj",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1xaGYjBd6pybVqNS7kEFlVPC5uZHwVTenpR_J3h5HEHQ",
+          "mode": "list",
+          "cachedResultName": "Ngetes Workshop",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xaGYjBd6pybVqNS7kEFlVPC5uZHwVTenpR_J3h5HEHQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1847054469,
+          "mode": "list",
+          "cachedResultName": "MasterWorkshop",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xaGYjBd6pybVqNS7kEFlVPC5uZHwVTenpR_J3h5HEHQ/edit#gid=1847054469"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Workshop",
+              "displayName": "Workshop",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Kapasitas",
+              "displayName": "Kapasitas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Terdaftar",
+              "displayName": "Terdaftar",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Sisa",
+              "displayName": "Sisa",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tanggal",
+              "displayName": "Tanggal",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        800,
+        896
+      ],
+      "id": "ba848991-8f2d-4e0a-975a-5b67de5e3b41",
+      "name": "Update Workshop Count",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "oMk2jD1MrCuJt7Oj",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "errorMessage": "Workshop tidak ditemukan di MasterWorkshop. Silakan hubungi admin."
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        800,
+        1104
+      ],
+      "id": "b9e75ea8-f1e5-43a9-8335-1356ccab6414",
+      "name": "Workshop Not Found Error"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI3": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store3",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet in Google Sheets1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store3": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MasterWorkshop Trigger": {
+      "main": [
+        [
+          {
+            "node": "Create New Workshop Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pendaftar Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Master Workshops",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create New Workshop Sheet": {
+      "main": [
+        [
+          {
+            "node": "Add Headers to New Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Master Workshops": {
+      "main": [
+        [
+          {
+            "node": "Check Workshop Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Workshop Exists": {
+      "main": [
+        [
+          {
+            "node": "Append to Workshop Sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Update Workshop Count",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Workshop Not Found Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1a860d27f85ac51a41ae6c56fa2f6e297699e550ade23b587ddbb0966ffd8097"
+  }
+}

@@ -1,0 +1,1320 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -400,
+        896
+      ],
+      "id": "5e6c8bfc-b708-45a5-93c3-c33a202b68fe",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "rJe1phlb2QnDYGKo",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2a4762ef-5fa5-47d5-a4bb-d3bfdc969844",
+              "name": "emailBody",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "0c6b4802-e3ff-48fd-a4a4-de27370a0bf4",
+              "name": "threadID",
+              "value": "={{ $json.threadId }}",
+              "type": "string"
+            },
+            {
+              "id": "4b6ba38c-6980-4d36-b17f-e0252c13a5ba",
+              "name": "sender",
+              "value": "={{ $json.from.value[0].address }}",
+              "type": "string"
+            },
+            {
+              "id": "6e17b5f9-86d4-483b-9a79-c8d886593c1d",
+              "name": "messageId",
+              "value": "={{ $json.messageId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        96,
+        912
+      ],
+      "id": "60484461-7aed-419d-a52d-e4ee0e407e80",
+      "name": "Set Content"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Analyze the content of the following message and determine the category. If the message pertains to any of the following topics, mark the corresponding field as true; otherwise, mark it as false.\n\nCategories Include:\n\nMAGANG_PKL Topics:\n- Questions about internship, PKL, or job opportunities\n- CV submissions or job applications\n- Career inquiries or fresh graduate positions\n- Portfolio submissions for internship\n\nKLIEN_WEB Topics:\n- Website or application development requests\n- Pricing inquiries for web services\n- Project discussions or quotations\n- Technical service requests\n\nOutput:\nProvide the result in JSON format with fields \"magangPKL\" and \"klienWeb\" set to true or false",
+              "role": "system"
+            },
+            {
+              "content": "=Here is the incoming email:  {{ $json.emailBody }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        336,
+        912
+      ],
+      "id": "771fac68-e34c-4809-a9eb-8fb92db26f19",
+      "name": "Customer Support",
+      "credentials": {
+        "openAiApi": {
+          "id": "ZEDkRMOzRtY8GSR5",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.content.magangPKL }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "6268982e-6fbf-4529-aeb8-b0c4a6ca6f55"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "magangPKL"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "9e9b39aa-e24a-4743-8fa7-4ab91574d15a",
+                    "leftValue": "={{ $json.message.content.klienWeb }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "klienWeb"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        736,
+        912
+      ],
+      "id": "311da261-7001-40e2-96ab-f32dfc6fd29c",
+      "name": "Jenis Konten"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e1214ff3-82ad-4600-8fe2-b25445636542",
+              "name": "attachments",
+              "value": "={{ $('Get a message').item.binary.keys() }}",
+              "type": "array"
+            },
+            {
+              "id": "96d713b3-e44c-4d17-b897-ce39e69f0d67",
+              "name": "message_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        272,
+        160
+      ],
+      "id": "00fe0609-aa99-4d30-bab9-c7c1bef73a80",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "advanced": true,
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "=message_id",
+              "field2": "id"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        672,
+        352
+      ],
+      "id": "d25b6518-7d22-43e3-a156-52e165661c7d",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "={{ $json.attachments }}",
+        "name": "={{ $json.attachments.fileName }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1vtGN47_laxdQdcBAqaV1_mZsRdxEGV9R",
+          "mode": "list",
+          "cachedResultName": "Dokumen PKL/Magang",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1vtGN47_laxdQdcBAqaV1_mZsRdxEGV9R"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        880,
+        352
+      ],
+      "id": "45eebf31-d479-4a66-8b91-ff1612afdefc",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "wn5GO9Vy79D91v38",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Ambil semua input\nconst allItems = $input.all() || [];\nconst result = {};\n\nconsole.log('🔍 Number of input items:', allItems.length);\n\n// CARI DATA EMAIL (YANG ADA threadID DAN messageId)\nlet emailData = null;\nlet driveData = [];\n\nallItems.forEach((item, index) => {\n  if (item && item.json) {\n    console.log(`📦 Item ${index}:`, Object.keys(item.json));\n    \n    // Prioritaskan data yang memiliki threadID atau messageId (DATA EMAIL)\n    if (item.json.threadID || item.json.messageId) {\n      emailData = item.json;\n      console.log('✅ FOUND EMAIL DATA:', {\n        threadID: emailData.threadID,\n        messageId: emailData.messageId,\n        sender: emailData.sender\n      });\n    }\n    // Data Google Drive (attachment)\n    else if (item.json.webViewLink || item.json.id) {\n      driveData.push(item.json);\n      console.log('📎 Found drive attachment:', item.json.name);\n    }\n  }\n});\n\n// JIKA TIDAK ADA DATA EMAIL, CARI DI TEMPAT LAIN\nif (!emailData) {\n  allItems.forEach(item => {\n    if (item && item.json && (item.json.threadId || item.json.id)) {\n      emailData = item.json;\n      console.log('🟡 Found alternative email data');\n    }\n  });\n}\n\n// EKSTRAK ID DARI DATA EMAIL (JANGAN DARI GOOGLE DRIVE!)\nconst originalThreadId = emailData?.threadID || emailData?.threadId;\nconst originalMessageId = emailData?.threadID || emailData?.threadId;\n\nconsole.log('🎯 USING EMAIL IDs:');\nconsole.log('   Thread ID:', originalThreadId);\nconsole.log('   Message ID:', originalMessageId);\n\n// BUAT RESULT DENGAN ID YANG BENAR (DARI EMAIL)\nresult[originalThreadId] = {\n  createdTime: new Date().toISOString(),\n  'Nama Lengkap': '',\n  'Asal Instansi': '',\n  CV: '',\n  'Surat Pengantar/Rekomendasi': '',\n  Portofolio: '',\n  'Tanggal Mulai': '',\n  'Tanggal Selesai': '',\n  Status: 'Belum Follow Up',\n  thread_id: originalThreadId,    // ← PASTIKAN INI DARI EMAIL\n  message_id: originalMessageId,  // ← PASTIKAN INI DARI EMAIL\n};\n\n// EKSTRAK NAMA DARI EMAIL BODY JIKA ADA\nif (emailData && emailData.emailBody) {\n  const emailBody = emailData.emailBody;\n  console.log('📧 Email body:', emailBody);\n  \n  // Cari nama dari email body\n  const nameMatch = emailBody.match(/Putu Nadya Putri Astina|Nadya|Astina/i);\n  if (nameMatch && !result[originalThreadId]['Nama Lengkap']) {\n    result[originalThreadId]['Nama Lengkap'] = nameMatch[0];\n    console.log('👤 Extracted name from email body:', nameMatch[0]);\n  }\n}\n\n// PROSES ATTACHMENT DARI GOOGLE DRIVE (HANYA UNTUK LINK)\ndriveData.forEach(driveItem => {\n  const fileName = driveItem.name || '';\n  const link = driveItem.webViewLink || '';\n  \n  if (fileName && link) {\n    console.log('📎 Processing:', fileName);\n    \n    // Extract nama dari filename (jika belum ada)\n    if (fileName.includes('_') && !result[originalThreadId]['Nama Lengkap']) {\n      const namePart = fileName.split('_')[1]?.split('.')[0];\n      if (namePart) {\n        result[originalThreadId]['Nama Lengkap'] = namePart.replace(/\\b\\w/g, l => l.toUpperCase());\n      }\n    }\n    \n    // Tentukan jenis dokumen\n    const lowerFileName = fileName.toLowerCase();\n    if (lowerFileName.includes('cv')) {\n      result[originalThreadId]['CV'] = link;\n    } else if (lowerFileName.includes('surat') || lowerFileName.includes('pengantar')) {\n      result[originalThreadId]['Surat Pengantar/Rekomendasi'] = link;\n    } else if (lowerFileName.includes('portofolio')) {\n      result[originalThreadId]['Portofolio'] = link;\n    }\n  }\n});\n\n// RETURN RESULT\nconst finalResult = Object.values(result);\nconsole.log('🎉 FINAL RESULT:');\nconsole.log('Thread ID:', finalResult[0]?.thread_id);\nconsole.log('Message ID:', finalResult[0]?.message_id);\nconsole.log('Full result:', JSON.stringify(finalResult, null, 2));\n\nreturn finalResult;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1328,
+        368
+      ],
+      "id": "fe0fd9d7-2370-404b-b7ee-334ee384f2ff",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "10wfzCfrj1fa-cRfAxwOKeQ-28y-n0qgn7EP-ait8KhY",
+          "mode": "list",
+          "cachedResultName": "Data Peserta Magang/PKL",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10wfzCfrj1fa-cRfAxwOKeQ-28y-n0qgn7EP-ait8KhY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1409948725,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10wfzCfrj1fa-cRfAxwOKeQ-28y-n0qgn7EP-ait8KhY/edit#gid=1409948725"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nama Lengkap": "={{ $json['Nama Lengkap'] }}",
+            "CV": "={{ $json.CV }}",
+            "Asal Instansi": "=",
+            "Surat Pengantar/Rekomendasi": "={{ $json['Surat Pengantar/Rekomendasi'] }}",
+            "Portofolio": "={{ $json.Portofolio }}",
+            "Tanggal Mulai": "=",
+            "Status": "={{ $json.Status }}",
+            "thread_id": "={{ $json.thread_id }}",
+            "message_id": "={{ $json.message_id }}",
+            "createdTime": "={{ $json.createdTime }}"
+          },
+          "matchingColumns": [
+            "message_id"
+          ],
+          "schema": [
+            {
+              "id": "Nama Lengkap",
+              "displayName": "Nama Lengkap",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Asal Instansi",
+              "displayName": "Asal Instansi",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Kode Instansi",
+              "displayName": "Kode Instansi",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Nomor Surat Awal",
+              "displayName": "Nomor Surat Awal",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Penerima Surat",
+              "displayName": "Penerima Surat",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Tanggal Mulai",
+              "displayName": "Tanggal Mulai",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tanggal Selesai",
+              "displayName": "Tanggal Selesai",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CV",
+              "displayName": "CV",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Surat Pengantar/Rekomendasi",
+              "displayName": "Surat Pengantar/Rekomendasi",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Portofolio",
+              "displayName": "Portofolio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "thread_id",
+              "displayName": "thread_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "message_id",
+              "displayName": "message_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "createdTime",
+              "displayName": "createdTime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1488,
+        368
+      ],
+      "id": "c6f6a6c4-dfca-4b3f-b24f-4b484dac9360",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "oMk2jD1MrCuJt7Oj",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bafe8740-c550-4d47-b9c9-9f306a258288",
+              "leftValue": "={{ $('Gmail Trigger').item.binary }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -176,
+        896
+      ],
+      "id": "a2d21424-de7d-475c-8b05-2b36777fcb34",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "10wfzCfrj1fa-cRfAxwOKeQ-28y-n0qgn7EP-ait8KhY",
+          "mode": "list",
+          "cachedResultName": "Data Peserta Magang/PKL",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10wfzCfrj1fa-cRfAxwOKeQ-28y-n0qgn7EP-ait8KhY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1409948725,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10wfzCfrj1fa-cRfAxwOKeQ-28y-n0qgn7EP-ait8KhY/edit#gid=1409948725"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        160,
+        -80
+      ],
+      "id": "a16f13c2-19a3-4d29-977e-64dbfd56c3e6",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "FC6QnzWxwWrHbZXL",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Ambil semua data dari Google Sheets\nconst items = $input.all();\n\n// 2. Fungsi untuk mendapatkan tanggal hari ini dalam format YYYY-MM-DD (WITA)\nfunction getTodayWITA() {\n    const now = new Date();\n    // Penyesuaian untuk WITA (UTC+8)\n    now.setHours(now.getHours() + 8);\n    return now.toISOString().split('T')[0];\n}\n\n// 3. Filter data dengan status \"Belum Follow Up\" dan dibuat hari ini\nconst today = getTodayWITA();\nconst belumFollowUp = items.filter(item => {\n    try {\n        if (item.json['Status'] !== 'Belum Follow Up') return false;\n\n        const dateStr = item.json['createdTime'];\n        if (!dateStr) return false;\n\n        const rowDate = new Date(dateStr);\n        if (isNaN(rowDate.getTime())) return false;\n\n        rowDate.setHours(rowDate.getHours() + 8); // WITA\n        const rowDateStr = rowDate.toISOString().split('T')[0];\n\n        return rowDateStr === today;\n    } catch (error) {\n        console.log('Error processing date:', error);\n        return false;\n    }\n});\n\n// 4. Hitung jumlah dan kumpulkan nama-nama\nconst jumlahPeserta = belumFollowUp.length;\nconst namaPeserta = belumFollowUp.map(item => item.json['Nama Lengkap']).join(', ');\n\n// 5. Siapkan output\nconst result = {\n    jumlah_peserta: jumlahPeserta,\n    daftar_nama: namaPeserta,\n    tanggal_rekap: today,\n    detail_peserta: belumFollowUp.map(item => ({\n        'Nama Lengkap': item.json['Nama Lengkap'] || '',\n        'Email': item.json['Email'] || '',\n        'No Telepon': item.json['No Telepon'] || '',\n        'Asal Instansi': item.json['Asal Instansi'] || '',\n        'CV': item.json['CV'] || '',\n        'Surat Pengantar': item.json['Surat Pengantar/Rekomendasi'] || '',\n        'Portofolio': item.json['Portofolio'] || '',\n        'Message ID': item.json['message_id'] || ''\n    })),\n};\n\n// 6. Return hasil\nreturn [result];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        368,
+        -80
+      ],
+      "id": "c6b2054a-6bc4-40e0-9c37-0bd83f50582c",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "sendTo": "nadyaputrias@gmail.com",
+        "subject": "Cek Pendaftaran Magang/PKL",
+        "message": "=Halo, terdapat {{ $json.jumlah_peserta }} anak magang atas nama {{ $json.daftar_nama }}. Mohon untuk di follow up lagi ya. Akses link di bawah ini untuk detail informasinya.\nhttps://docs.google.com/spreadsheets/d/10wfzCfrj1fa-cRfAxwOKeQ-28y-n0qgn7EP-ait8KhY/edit?usp=drive_link",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        576,
+        -80
+      ],
+      "id": "d12cc5a6-9ae1-410c-a01a-278856e3b75c",
+      "name": "Send a message",
+      "webhookId": "b7937ea1-0572-423c-b1c9-ffb73d83bb2b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "rJe1phlb2QnDYGKo",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1376,
+        928
+      ],
+      "id": "5d1c449d-0b1c-421f-9535-d05c07ae9121",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "ZEDkRMOzRtY8GSR5",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "load",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "magang-pkl-index",
+          "mode": "list",
+          "cachedResultName": "magang-pkl-index"
+        },
+        "prompt": "={{ $('Set Content').item.json.emailBody }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        1040,
+        752
+      ],
+      "id": "82e1874f-2bf4-40c0-9572-dc4d2949cb08",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "W0kzKeIkO3RgLWTD",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-large",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1136,
+        960
+      ],
+      "id": "656f7641-a1ba-40b7-89d3-55b34cc9e1b1",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "ZEDkRMOzRtY8GSR5",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Set Content').item.json.threadID }}",
+        "emailType": "text",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1744,
+        752
+      ],
+      "id": "91d7208f-6d41-4e93-8932-9726e96d4a28",
+      "name": "Reply to a message1",
+      "webhookId": "05b21f59-8aa2-477b-9afa-113de8036f01",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "rJe1phlb2QnDYGKo",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1360,
+        1312
+      ],
+      "id": "432e05bb-6c06-4343-b10f-04cab0b7c6c1",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "ZEDkRMOzRtY8GSR5",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "load",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "penjualan-website-index",
+          "mode": "list",
+          "cachedResultName": "penjualan-website-index"
+        },
+        "prompt": "={{ $('Set Content').item.json.emailBody }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        1024,
+        1136
+      ],
+      "id": "36182a70-8f0c-493d-b3fb-26c1d01766f3",
+      "name": "Pinecone Vector Store1",
+      "credentials": {
+        "pineconeApi": {
+          "id": "W0kzKeIkO3RgLWTD",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-large",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1120,
+        1344
+      ],
+      "id": "0a8f30c0-a1ce-4f18-8f54-8da87c5a3bc9",
+      "name": "Embeddings OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "ZEDkRMOzRtY8GSR5",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Set Content').item.json.threadID }}",
+        "emailType": "text",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1728,
+        1136
+      ],
+      "id": "5cc06ae9-380f-4c24-a09d-5f6c534a0911",
+      "name": "Reply to a message2",
+      "webhookId": "05b21f59-8aa2-477b-9afa-113de8036f01",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "rJe1phlb2QnDYGKo",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Pertanyaan: {{ $('Set Content').item.json.emailBody }} \\nContext: {{ $json.document.pageContent }}",
+        "options": {
+          "systemMessage": "Anda adalah HR Assistant. Gunakan HANYA context di atas dengan Format PROFESIONAL"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        1392,
+        752
+      ],
+      "id": "f39c7326-7215-4702-8ebf-1451bc9547ae",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Pertanyaan: {{ $('Set Content').item.json.emailBody }} \\nContext: {{ $json.document.pageContent }}",
+        "options": {
+          "systemMessage": "Anda adalah Sales Assistant. Gunakan HANYA context di atas dengan Format PROFESIONAL"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        1376,
+        1136
+      ],
+      "id": "bce89c75-c508-4e52-8046-f4c44e5fe234",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "content": "## Note\n**Double click** to edit me.\n1. Tambahin conditional biar bisa langsung isi form sesuai dg workshop.\n2. benerin logic bia bisa nyimpen 1 informasi untuk 1 orang dalam 1 row.\n3. [optional] isi summarization.",
+        "width": 528,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2320,
+        800
+      ],
+      "typeVersion": 1,
+      "id": "39eaa72c-f1ec-4da3-a11e-f068fe788f80",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "height": 784,
+        "width": 2256
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        -96
+      ],
+      "typeVersion": 1,
+      "id": "98573150-c196-4817-aa4e-039fab4592c8",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "height": 224,
+        "width": 672,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        96,
+        -96
+      ],
+      "typeVersion": 1,
+      "id": "a7d8b674-8528-485f-9237-9e89448c8e2a",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $json.id }}",
+        "simple": false,
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        112,
+        368
+      ],
+      "id": "71b41635-9936-4fe1-8845-40560c2e1702",
+      "name": "Get a message",
+      "webhookId": "ae5d5f47-6362-4ec8-b213-1f327d6ac3ba",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "rJe1phlb2QnDYGKo",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Pengiriman dokumen yang dibutuhkan untuk melamar dalam kegiatan Magang/PKL di CV. Sinar Teknologi Indonesia. Berikan Yth nya sesuai sama {{ $json[\"Nama Lengkap\"] }}",
+        "options": {
+          "systemMessage": "Anda adalah HR Assistant. Gunakan HANYA context di atas dengan Format PROFESIONAL untuk membalas dokumen-dokumen yang telah dikirimkan oleh pelamar. Pelamar HANYA mahasiswa atau siswa SMK, pastikan sesuai."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        1696,
+        368
+      ],
+      "id": "1201df71-2b07-4c59-b91a-cdaedf3189bb",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1632,
+        560
+      ],
+      "id": "95ee14e1-c307-4ee4-b73c-bf05544b8611",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "ZEDkRMOzRtY8GSR5",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Get a message').first().json.id }}",
+        "emailType": "text",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2032,
+        368
+      ],
+      "id": "23924157-10d9-46b7-96b7-39ccca668ae5",
+      "name": "Reply to a message",
+      "webhookId": "cfb9a5f2-b944-470d-8cac-c8e485a71428",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "rJe1phlb2QnDYGKo",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "attachments",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        480,
+        160
+      ],
+      "id": "f67d2d9c-88da-4d7a-8462-141932731b0c",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2a4762ef-5fa5-47d5-a4bb-d3bfdc969844",
+              "name": "emailBody",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "0c6b4802-e3ff-48fd-a4a4-de27370a0bf4",
+              "name": "threadID",
+              "value": "={{ $json.threadId }}",
+              "type": "string"
+            },
+            {
+              "id": "4b6ba38c-6980-4d36-b17f-e0252c13a5ba",
+              "name": "sender",
+              "value": "={{ $json.from.value[0].address }}",
+              "type": "string"
+            },
+            {
+              "id": "6e17b5f9-86d4-483b-9a79-c8d886593c1d",
+              "name": "messageId",
+              "value": "={{ $json.messageId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        512
+      ],
+      "id": "f786b16f-8123-437a-ae48-bf81232d3a59",
+      "name": "Set Content1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1152,
+        368
+      ],
+      "id": "a77d5939-e8db-450d-849d-43a982add310",
+      "name": "Merge1"
+    }
+  ],
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Content": {
+      "main": [
+        [
+          {
+            "node": "Customer Support",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Customer Support": {
+      "main": [
+        [
+          {
+            "node": "Jenis Konten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jenis Konten": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload file": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Get a message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Set Content1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Reply to a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Reply to a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a message": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Reply to a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Content1": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1a860d27f85ac51a41ae6c56fa2f6e297699e550ade23b587ddbb0966ffd8097"
+  }
+}

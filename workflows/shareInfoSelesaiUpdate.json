@@ -1,0 +1,136 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "f8dd0590-0144-41ab-b972-f0fd059a7323",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        16,
+        -80
+      ],
+      "id": "ac71978a-153c-421e-ab16-ec0457101603",
+      "name": "Webhook",
+      "webhookId": "f8dd0590-0144-41ab-b972-f0fd059a7323"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Buat deskripsi update sistem seperti laporan progres ke dosen, dengan bahasa sederhana dan mudah dipahami. Gunakan data commit berikut:\n\nPesan commit: {{ $json.body.head_commit.message }}\nFile diubah: {{ $json.body.head_commit.modified }}\nFile baru: {{ $json.body.head_commit.added }}\nFile dihapus: {{ $json.body.head_commit.removed }}\n\nAturan penulisan:\nGunakan kata kerja sesuai konteks:\nmenambahkan → untuk hal baru yang ditambahkan\nmemperbarui → untuk hal yang diubah/dirapikan\nmenghapus → untuk hal yang dihapus\nGunakan kata “kami” untuk menyebut tim.\nFokus pada apa yang diubah, tujuannya, dan manfaatnya bagi pengguna.\n\nHindari istilah teknis (misal: webhook → sistem penerima pesan, API → sistem, database → tempat data, real-time → langsung).\n\nJangan menyebut file, commit, atau kata “siap digunakan”.\nSusun dalam 1 paragraf ringkas (3–5 baris WhatsApp, ±80–100 kata).\nStruktur kalimat: apa yang kami lakukan – tujuan/perubahan – manfaat untuk pengguna.\n\nAkhiri dengan keterangan netral tentang progres, misal: “perubahan ini telah dicatat” atau “update ini sudah diterapkan di sistem”.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        256,
+        -80
+      ],
+      "id": "01994fa2-96c4-4a20-b026-33229e306833",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        304,
+        160
+      ],
+      "id": "91bc478d-c168-472d-9d50-3822b7782a0f",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "ZEDkRMOzRtY8GSR5",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.fonnte.com/send",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "authorization",
+              "value": "3ssevwCHZUrLwZarm9bN"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message",
+              "value": "={{ $json.output }}"
+            },
+            {
+              "name": "target",
+              "value": "120363419288042412@g.us"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        624,
+        -80
+      ],
+      "id": "669c1381-11a4-497f-bed7-f1fbeedce630",
+      "name": "HTTP Request"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1a860d27f85ac51a41ae6c56fa2f6e297699e550ade23b587ddbb0966ffd8097"
+  }
+}

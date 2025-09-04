@@ -1,0 +1,205 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1xaGYjBd6pybVqNS7kEFlVPC5uZHwVTenpR_J3h5HEHQ",
+          "mode": "list",
+          "cachedResultName": "Ngetes Workshop",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xaGYjBd6pybVqNS7kEFlVPC5uZHwVTenpR_J3h5HEHQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1221519636,
+          "mode": "list",
+          "cachedResultName": "Workshop 2",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xaGYjBd6pybVqNS7kEFlVPC5uZHwVTenpR_J3h5HEHQ/edit#gid=1221519636"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -768,
+        320
+      ],
+      "id": "08e0728e-39dc-4d54-bf21-2ec090827758",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "FC6QnzWxwWrHbZXL",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Ambil semua item dari input\nconst data = $input.all();\n\n// Filter hanya yang Kehadiran-nya \"Hadir\"\nconst hadirOnly = data.filter(item => item.json.Kehadiran === \"Hadir\");\n\n// Hilangkan duplikat berdasarkan Nama\nconst uniqueByNama = [];\nconst result = [];\n\nfor (const item of hadirOnly) {\n  if (!uniqueByNama.includes(item.json.Nama)) {\n    uniqueByNama.push(item.json.Nama);\n    result.push({\n      json: {\n        nama: item.json.Nama,\n        email: item.json.Email\n      }\n    });\n  }\n}\n\nreturn result;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -560,
+        320
+      ],
+      "id": "c2bfa12f-a9ec-4d09-9cc5-0122f6086bf5",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "={{$json[\"nama\"]}}",
+        "returnAll": true,
+        "filter": {
+          "driveId": {
+            "__rl": true,
+            "value": "My Drive",
+            "mode": "list",
+            "cachedResultName": "My Drive",
+            "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+          },
+          "folderId": {
+            "__rl": true,
+            "value": "1cbkXPlFu5tj8WzVa0WLTpVhZF0c_WSlV",
+            "mode": "list",
+            "cachedResultName": "Peserta Workshop 2",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1cbkXPlFu5tj8WzVa0WLTpVhZF0c_WSlV"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -336,
+        320
+      ],
+      "id": "7a060bdb-b5b0-46b6-b650-3f5646e06649",
+      "name": "Search files and folders",
+      "executeOnce": false,
+      "alwaysOutputData": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "wn5GO9Vy79D91v38",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "binaryPropertyName": "data"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -128,
+        320
+      ],
+      "id": "08d227f8-ae4e-41ee-bf23-98486d57896f",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "wn5GO9Vy79D91v38",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Code').item.json.email }}",
+        "subject": "Sertifikat Keikutsertaan – Workshop \"Bikin Aplikasi Tanpa Ngoding\"",
+        "emailType": "text",
+        "message": "=Halo {{ $('Code').item.json.nama }},\n\nTerima kasih telah berpartisipasi dalam kegiatan Workshop \"Bikin Aplikasi Tanpa Ngoding\" pada tanggal 9 Agustus 2025.\nSebagai apresiasi, kami lampirkan sertifikat keikutsertaan Anda pada email ini.\n\nSemoga ilmu yang diperoleh bermanfaat dan menginspirasi Anda untuk terus berkarya! 🚀\n\nSalam hangat,\nTim Penyelenggara Workshop",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        96,
+        320
+      ],
+      "id": "d68a51f2-8530-4a73-ad4b-c1c34063ec23",
+      "name": "Send a message",
+      "webhookId": "f8e7f266-3ea0-4359-914a-2f80efb6ebe5",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "rJe1phlb2QnDYGKo",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Search files and folders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search files and folders": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1a860d27f85ac51a41ae6c56fa2f6e297699e550ade23b587ddbb0966ffd8097"
+  }
+}

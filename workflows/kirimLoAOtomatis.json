@@ -1,0 +1,472 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "10wfzCfrj1fa-cRfAxwOKeQ-28y-n0qgn7EP-ait8KhY",
+          "mode": "list",
+          "cachedResultName": "Data Peserta Magang/PKL",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10wfzCfrj1fa-cRfAxwOKeQ-28y-n0qgn7EP-ait8KhY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1409948725,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10wfzCfrj1fa-cRfAxwOKeQ-28y-n0qgn7EP-ait8KhY/edit#gid=1409948725"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Status",
+              "lookupValue": "Belum Follow Up"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        16,
+        336
+      ],
+      "id": "2433f621-e9cd-4bb6-a30c-af9d5fac14d7",
+      "name": "Get rows - Belum Follow Up",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "oMk2jD1MrCuJt7Oj",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "URL/HTML to PDF",
+        "convertType": "htmlToPDF",
+        "html": "={{ $json.html }}",
+        "advancedOptions": {
+          "margins": "0.5in"
+        }
+      },
+      "type": "n8n-nodes-pdfco.PDFco Api",
+      "typeVersion": 1,
+      "position": [
+        800,
+        320
+      ],
+      "id": "3565202f-4b01-47da-8ef9-5477f2e3acd5",
+      "name": "Convert to PDF",
+      "credentials": {
+        "pdfcoApi": {
+          "id": "W06fJpBlOGTjMbW9",
+          "name": "PDF.co account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "pdf"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        320
+      ],
+      "id": "b8ecb972-46aa-407b-8dcf-e6b75bea6fc7",
+      "name": "Download PDF"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        432,
+        336
+      ],
+      "id": "5164a15a-360c-4a06-b2a2-ba7dfe2757a3",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "html": "<!DOCTYPE html>\n<html lang=\"id\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Surat Balasan - CV Sinar Teknologi Indonesia</title>\n    <style>\n        @page {\n            size: A4;\n            margin: 0;\n        }\n        \n        body {\n            width: 210mm;\n            height: 297mm;\n            margin: 0 auto;\n            padding: 15mm;\n            font-family: 'Times New Roman', serif;\n            font-size: 12pt;\n            line-height: 1.5;\n            color: #000;\n            box-sizing: border-box;\n        }\n        \n        .a4-page {\n            width: 180mm;\n            min-height: 267mm;\n            margin: 0 auto;\n            position: relative;\n        }\n        \n        /* === HEADER === */\n        .letter-header {\n            display: flex;\n            align-items: center;\n            justify-content: center;\n            border-bottom: 2px solid #000;\n            padding: 10px 0;\n            min-height: 120px; \n        }\n        \n        .logo-container img {\n            height: 100%;\n            max-height: 150px;\n            width: auto;\n        }\n\n        .company-info {\n            text-align: center;\n            flex: 1;\n        }\n        \n        .company-name {\n            font-size: 16pt;\n            font-weight: bold;\n            text-transform: uppercase;\n            margin-bottom: 5px;\n        }\n        \n        .company-address {\n            font-size: 11pt;\n            margin-bottom: 5px;\n        }\n        \n        /* === BODY === */\n        .letter-meta {\n            margin: 20px 0;\n        }\n        \n        .letter-number {\n            margin-bottom: 5px;\n        }\n        \n        .letter-subject {\n            margin: 5px 0;\n        }\n        \n        .letter-content {\n            text-align: justify;\n        }\n        \n        .address-block {\n            margin: 15px 0;\n            text-align: left;\n        }\n        \n        .salutation {\n            margin: 15px 0;\n        }\n        \n        .paragraph {\n            margin-bottom: 15px;\n            text-indent: 40px;\n            text-align: justify;\n        }\n        \n        .closing {\n            margin-top: 30px;\n            text-align: justify;\n        }\n        \n        .signature {\n            text-align: justify;\n        }\n        \n        .director-name {\n            font-weight: bold;\n        }\n        \n        .position {\n            margin-top: -5px;\n        }        \n    </style>\n</head>\n<body>\n    <div class=\"a4-page\">\n        <div class=\"letter-header\">\n            <div class=\"logo-container\">\n                <img src=\"https://drive.google.com/thumbnail?id=1Htu9pluvwxd08Cg12sl5sg_nELzYBvb0&sz=w500\" alt=\"Logo Perusahaan\" class=\"company-logo\">\n            </div>\n            <div class=\"company-info\">\n                <div class=\"company-name\">CV SINAR TEKNOLOGI INDONESIA</div>\n                <div class=\"company-address\">\n                    Jl. Diponegoro No. 165A, Dauh Puri Klod, Denpasar Barat, Bali 80114\n                </div>\n                <div class=\"company-address\">\n                    Email: sintekstudio@gmail.com | Telp: 082144409789\n                </div>\n            </div>\n        </div>\n        \n        <div class=\"letter-meta\">\n            <div class=\"letter-number\"><strong>Nomor:</strong> {{ $json.processed.nomor_surat }}</div>\n            <div class=\"letter-number\"><strong>Lampiran:</strong> -</div>\n            <div class=\"letter-subject\"><strong>Hal: </strong> Balasan Permohonan Penempatan Mahasiswa PKL</div>\n        </div>\n        \n        <div class=\"letter-content\">\n            <div class=\"address-block\">\n                <br>\n                <p>Kepada Yth.<br>\n                {{ $json['Penerima Surat'] }}<br>\n                <strong>{{ $json['Asal Instansi'] }}</strong><br>\n                <strong>Jl. Diponegoro No. 165a, Dauh Puri Klod, Kec. Denpasar Barat, Kota Denpasar</strong></p>\n            </div>\n            \n            <div class=\"salutation\">\n                <p>Dengan hormat,</p>\n            </div>\n            \n            <div class=\"paragraph\">\n                Menanggapi surat permohonan penempatan mahasiswa Praktik Kerja Lapangan (PKL)\n                Nomor: {{ $json[\"Nomor Surat Awal\"] }}\n                tertanggal {{ $json.processed.tanggal_pengajuan }}, dengan ini kami menyampaikan bahwa \n                <strong>CV Sinar Teknologi Indonesia</strong> menerima pengajuan tersebut.\n            </div>\n            \n            <div class=\"paragraph\">\n                Kami menyambut baik kesempatan untuk berkontribusi dalam pengembangan kompetensi\n                mahasiswa {{ $json[\"Asal Instansi\"] }}, khususnya dalam bidang teknologi informasi.\n                Kami berharap para mahasiswa yang akan melaksanakan PKL dapat memanfaatkan\n                kesempatan ini untuk belajar, mengembangkan diri, serta menjalankan tugas dengan penuh\n                tanggung jawab.\n            </div>\n            \n            <div class=\"paragraph\">\n                Kami menantikan kedatangan mahasiswa yang bersangkutan sesuai dengan periode\n                pelaksanaan PKL yang telah ditentukan, yakni <strong>{{ $json.processed.periode_pkl }}</strong>.\n            </div>\n            \n            <div class=\"paragraph\">\n                Demikian surat ini kami sampaikan. Atas perhatian dan kerja samanya kami ucapkan terima\n                kasih.\n            </div>\n            \n            <div class=\"closing\">\n                <p>Hormat kami,<br>\n                <strong>CV Sinar Teknologi Indonesia</strong></p>\n            </div>\n            \n            <div class=\"signature\">\n              <img src=\"https://drive.google.com/thumbnail?id=1lO6ol8sIzle1ICmB-1hp0mxV_oLXr9gb&sz=w500\"\n                 alt=\"Tanda Tangan\"\n                 width=\"150\">\n              <div class=\"director-name\">Zulham Azwar Achmad</div>\n              <div class=\"position\">Direktur</div>\n          </div>\n        </div>        \n    </div>\n</body>\n</html>"
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        640,
+        416
+      ],
+      "id": "9f1b5c35-723a-4a25-9332-c8fa690fd7f1",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Ambil semua baris dari INPUT, bukan dari node tertentu\nconst sheetItems = $input.all();\n\nconsole.log('Number of input items:', sheetItems.length);\nconsole.log('Input data sample:', JSON.stringify(sheetItems[0], null, 2));\n\nif (!sheetItems || sheetItems.length === 0) {\n  console.log('No input data found');\n  return [];\n}\n\nconst result = [];\n\n// Proses setiap baris\nfor (let i = 0; i < sheetItems.length; i++) {\n  const item = sheetItems[i];\n  const data = { ...item.json };\n\n  console.log(`Processing row ${i + 1}: ${data['Nama Lengkap']}`);\n\n  // Nomor surat\n  const rowNumber = parseInt(data[\"row_number\"]) || (i + 1);\n  const docNumber = String(rowNumber).padStart(3, '0');\n  const kodeInstansi = data[\"Kode Instansi\"] || \"UNUD\";\n  \n  // Tanggal\n  const createdTime = data[\"createdTime\"] || new Date().toISOString();\n  const createdDate = new Date(createdTime);\n  const monthRoman = toRoman(createdDate.getMonth() + 1);\n  const year = createdDate.getFullYear();\n\n  // Data yang diproses\n  data.processed = {\n    nomor_surat: `${docNumber}/${kodeInstansi}/PKL/${monthRoman}/${year}`,\n    tanggal_pengajuan: formatDate(createdTime),\n    periode_pkl: `${formatDate(data[\"Tanggal Mulai\"])} – ${formatDate(data[\"Tanggal Selesai\"])}`,\n    current_date: formatDate(new Date()),\n    row_index: i + 1,\n    total_rows: sheetItems.length\n  };\n\n  // Konfigurasi email\n  data.emailSubject = `Balasan Permohonan PKL/Magang - ${data['Nama Lengkap']}`;\n  data.emailBody = `Kepada Yth. ${data['Penerima Surat']},\\n\\nTerlampir surat balasan permohonan Praktik Kerja Lapangan (PKL) untuk ${data['Nama Lengkap']} dari ${data['Asal Instansi']}.\\n\\nTerima kasih atas kerjasamanya.\\n\\nHormat kami,\\nCV Sinar Teknologi Indonesia`;\n\n  // Push seluruh row\n  result.push({ json: data });\n}\n\nconsole.log(`Successfully processed ${result.length} rows`);\nreturn result;\n\n// ===== Helper Functions =====\nfunction toRoman(num) {\n  const romanNumerals = [\n    { value: 12, symbol: 'XII' }, { value: 11, symbol: 'XI' }, { value: 10, symbol: 'X' },\n    { value: 9, symbol: 'IX' }, { value: 8, symbol: 'VIII' }, { value: 7, symbol: 'VII' },\n    { value: 6, symbol: 'VI' }, { value: 5, symbol: 'V' }, { value: 4, symbol: 'IV' },\n    { value: 3, symbol: 'III' }, { value: 2, symbol: 'II' }, { value: 1, symbol: 'I' }\n  ];\n  let result = '';\n  for (const { value, symbol } of romanNumerals) {\n    while (num >= value) {\n      result += symbol;\n      num -= value;\n    }\n  }\n  return result;\n}\n\nfunction formatDate(dateString) {\n  if (!dateString) return '';\n\n  const months = [\n    'Januari','Februari','Maret','April','Mei','Juni',\n    'Juli','Agustus','September','Oktober','November','Desember'\n  ];\n\n  let date;\n  if (typeof dateString === 'string' && dateString.includes('/')) {\n    const [month, day, year] = dateString.split('/');\n    date = new Date(year, month - 1, day);\n  } else {\n    date = new Date(dateString);\n  }\n\n  if (isNaN(date.getTime())) return '';\n  return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        336
+      ],
+      "id": "414a50dd-aced-4cb7-b7cf-3d40f8806859",
+      "name": "Process Data"
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Get rows - Belum Follow Up').item.json.message_id }}",
+        "message": "={{ $('Process Data').item.json.emailBody }}",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {
+                "property": "pdf"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1136,
+        320
+      ],
+      "id": "1a6c5ecf-647a-4f54-bb0d-ea7f43e53838",
+      "name": "Reply to a message",
+      "webhookId": "3580483b-af4f-4b4f-88f1-a80eff4cc3d0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "rJe1phlb2QnDYGKo",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "10wfzCfrj1fa-cRfAxwOKeQ-28y-n0qgn7EP-ait8KhY",
+          "mode": "list",
+          "cachedResultName": "Data Peserta Magang/PKL",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10wfzCfrj1fa-cRfAxwOKeQ-28y-n0qgn7EP-ait8KhY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1409948725,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10wfzCfrj1fa-cRfAxwOKeQ-28y-n0qgn7EP-ait8KhY/edit#gid=1409948725"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Get rows - Belum Follow Up').item.json.row_number }}",
+            "Status": "Sudah Follow Up"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Nama Lengkap",
+              "displayName": "Nama Lengkap",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Asal Instansi",
+              "displayName": "Asal Instansi",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Kode Instansi",
+              "displayName": "Kode Instansi",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Nomor Surat Awal",
+              "displayName": "Nomor Surat Awal",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Penerima Surat",
+              "displayName": "Penerima Surat",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Tanggal Mulai",
+              "displayName": "Tanggal Mulai",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Tanggal Selesai",
+              "displayName": "Tanggal Selesai",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "CV",
+              "displayName": "CV",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Surat Pengantar/Rekomendasi",
+              "displayName": "Surat Pengantar/Rekomendasi",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Portofolio",
+              "displayName": "Portofolio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "thread_id",
+              "displayName": "thread_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "message_id",
+              "displayName": "message_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "createdTime",
+              "displayName": "createdTime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1344,
+        320
+      ],
+      "id": "219bb051-1794-4ef5-9d58-bf202bbe8e9f",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "oMk2jD1MrCuJt7Oj",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        336
+      ],
+      "id": "1945555e-a6d6-4bd1-904d-bf91af201d74",
+      "name": "When clicking 'Execute workflow'"
+    }
+  ],
+  "connections": {
+    "Get rows - Belum Follow Up": {
+      "main": [
+        [
+          {
+            "node": "Process Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to PDF": {
+      "main": [
+        [
+          {
+            "node": "Download PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download PDF": {
+      "main": [
+        [
+          {
+            "node": "Reply to a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Convert to PDF",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Data": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply to a message": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking 'Execute workflow'": {
+      "main": [
+        [
+          {
+            "node": "Get rows - Belum Follow Up",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1a860d27f85ac51a41ae6c56fa2f6e297699e550ade23b587ddbb0966ffd8097"
+  }
+}

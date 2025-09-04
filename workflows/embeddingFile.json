@@ -1,0 +1,732 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFile",
+        "fileToWatch": {
+          "__rl": true,
+          "value": "https://docs.google.com/document/d/1gbtfLrUov_qY35nwKOjrsGQgq6GwkCuz3ElsRXG7QJ4/edit?tab=t.0",
+          "mode": "url"
+        }
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        48,
+        80
+      ],
+      "id": "7588e4c9-37be-4b98-95cc-9ac16acac6c0",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "wn5GO9Vy79D91v38",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "=1gbtfLrUov_qY35nwKOjrsGQgq6GwkCuz3ElsRXG7QJ4"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        240,
+        80
+      ],
+      "id": "2afdcb39-53c7-4801-aa00-f5eb0feee2e1",
+      "name": "Get a document1",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "mSKiHmXL1qxUuFU6",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "update",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "magang-pkl-index",
+          "mode": "list",
+          "cachedResultName": "magang-pkl-index"
+        },
+        "id": "={{ $('Get a document1').item.json.documentId }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        624,
+        80
+      ],
+      "id": "454f495b-1d09-461e-a342-b1509d797544",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "W0kzKeIkO3RgLWTD",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-large",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        608,
+        272
+      ],
+      "id": "b890f576-8ccf-455e-8d87-e62bc49a8784",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "ZEDkRMOzRtY8GSR5",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "content",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        432,
+        80
+      ],
+      "id": "0bf7ecc0-ceee-4486-a86c-fb5ec804ca4d",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "content": "## Embedding FAQ Magang/PKL \n**Double click** to edit me. ",
+        "height": 416,
+        "width": 1024
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "f78018c1-0ee0-4ae0-93b9-6f9e8928e736",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFile",
+        "fileToWatch": {
+          "__rl": true,
+          "value": "https://docs.google.com/document/d/1GLoEH8ZYPoIWkA5OosKsBhkni9m7Ig8N7cokxIO_Mc0/edit?tab=t.0#heading=h.siieacc4698i",
+          "mode": "url"
+        }
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        48,
+        560
+      ],
+      "id": "b86a93fc-cdf7-4691-a6d5-d55da019b5be",
+      "name": "Google Drive Trigger1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "wn5GO9Vy79D91v38",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Embedding FAQ Barang/Jasa \n**Double click** to edit me. ",
+        "height": 416,
+        "width": 1024,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        480
+      ],
+      "typeVersion": 1,
+      "id": "12b5281a-c69b-46b1-a93d-14d201383df1",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "=1GLoEH8ZYPoIWkA5OosKsBhkni9m7Ig8N7cokxIO_Mc0"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        224,
+        560
+      ],
+      "id": "c909226b-48e2-4a92-80c7-b63400c9fd07",
+      "name": "Get a document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "mSKiHmXL1qxUuFU6",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "content",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        432,
+        560
+      ],
+      "id": "946556ef-6c30-4766-bc6b-6ca966c6b7b8",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "mode": "update",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "penjualan-website-index",
+          "mode": "list",
+          "cachedResultName": "penjualan-website-index"
+        },
+        "id": "={{ $('Get a document').item.json.documentId }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        640,
+        560
+      ],
+      "id": "c1db58d2-4c15-4e97-b591-ac0649e4665a",
+      "name": "Pinecone Vector Store2",
+      "credentials": {
+        "pineconeApi": {
+          "id": "W0kzKeIkO3RgLWTD",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-large",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        624,
+        752
+      ],
+      "id": "b4774684-43cf-48e0-8a86-ac6fa1aa2f17",
+      "name": "Embeddings OpenAI2",
+      "credentials": {
+        "openAiApi": {
+          "id": "ZEDkRMOzRtY8GSR5",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFile",
+        "fileToWatch": {
+          "__rl": true,
+          "value": "https://docs.google.com/document/d/1GwHgqR3aCEorbyVhNBLF5TpXjYuitC5gcLWi445gJm0/edit?tab=t.0",
+          "mode": "url"
+        }
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        48,
+        1024
+      ],
+      "id": "d4384399-8189-4b69-866d-9e0feb9b116c",
+      "name": "Google Drive Trigger2",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "wn5GO9Vy79D91v38",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Embedding FAQ Workshop \n**Double click** to edit me. ",
+        "height": 848,
+        "width": 1248,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -16,
+        944
+      ],
+      "typeVersion": 1,
+      "id": "6ff45855-14cb-47fe-92e4-f2d449a97b49",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "=1GwHgqR3aCEorbyVhNBLF5TpXjYuitC5gcLWi445gJm0"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        224,
+        1024
+      ],
+      "id": "d027dfdc-9994-4582-a679-13045cb5e1f8",
+      "name": "Get a document2",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "mSKiHmXL1qxUuFU6",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "content",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        432,
+        1024
+      ],
+      "id": "b04a458c-0665-446d-a099-66ee939c6d4c",
+      "name": "Split Out2"
+    },
+    {
+      "parameters": {
+        "mode": "update",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "workshop-index",
+          "mode": "list",
+          "cachedResultName": "workshop-index"
+        },
+        "id": "={{ $('Get a document2').item.json.documentId }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        640,
+        1024
+      ],
+      "id": "2e81631a-5249-4561-aa11-10066403a3e4",
+      "name": "Pinecone Vector Store3",
+      "credentials": {
+        "pineconeApi": {
+          "id": "W0kzKeIkO3RgLWTD",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-large",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        624,
+        1216
+      ],
+      "id": "6296f46c-e938-461b-b957-d371fd807889",
+      "name": "Embeddings OpenAI3",
+      "credentials": {
+        "openAiApi": {
+          "id": "ZEDkRMOzRtY8GSR5",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1xaGYjBd6pybVqNS7kEFlVPC5uZHwVTenpR_J3h5HEHQ",
+          "mode": "list",
+          "cachedResultName": "Ngetes Workshop",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xaGYjBd6pybVqNS7kEFlVPC5uZHwVTenpR_J3h5HEHQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1847054469,
+          "mode": "list",
+          "cachedResultName": "MasterWorkshop",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xaGYjBd6pybVqNS7kEFlVPC5uZHwVTenpR_J3h5HEHQ/edit#gid=1847054469"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        240,
+        1456
+      ],
+      "id": "cfa0dee3-6d6c-4ec6-a566-9bbc19c9b695",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "oMk2jD1MrCuJt7Oj",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFile",
+        "fileToWatch": {
+          "__rl": true,
+          "value": "=https://docs.google.com/spreadsheets/d/1xaGYjBd6pybVqNS7kEFlVPC5uZHwVTenpR_J3h5HEHQ/edit?gid=1847054469#gid=1847054469",
+          "mode": "url"
+        }
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        32,
+        1456
+      ],
+      "id": "fa9ae244-c22c-4124-aac7-5fa6729d8bcc",
+      "name": "Google Drive Trigger3",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "wn5GO9Vy79D91v38",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "update",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "workshop-index",
+          "mode": "list",
+          "cachedResultName": "workshop-index"
+        },
+        "id": "={{ $json.id.toLocaleString() }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        816,
+        1456
+      ],
+      "id": "35e5e7a4-b6df-4bea-b4fe-efa479214313",
+      "name": "Pinecone Vector Store4",
+      "credentials": {
+        "pineconeApi": {
+          "id": "W0kzKeIkO3RgLWTD",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-large",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        896,
+        1648
+      ],
+      "id": "2eb5179c-3a50-49b3-9b97-183f00d656bf",
+      "name": "Embeddings OpenAI4",
+      "credentials": {
+        "openAiApi": {
+          "id": "ZEDkRMOzRtY8GSR5",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1342ce70-3ef0-4b77-b63b-7894f42b2785",
+              "name": "document",
+              "value": "={{ $json.Workshop }}, kapasitas: {{ $json.Kapasitas }}, pendaftar: {{ $json.Terdaftar }}, sisa: {{ $json.Sisa }}, tanggal pelaksanaan: {{ $json.Tanggal }}",
+              "type": "string"
+            },
+            {
+              "id": "75dca5c7-b0b4-44f0-869f-68b648f2725d",
+              "name": "id",
+              "value": "={{ $json.row_number }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        624,
+        1456
+      ],
+      "id": "b073f2be-5def-48ce-97eb-3c4ae041650a",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "row_number",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        448,
+        1456
+      ],
+      "id": "c69288ad-8c53-4710-ad4c-5453670212a9",
+      "name": "Split Out3"
+    }
+  ],
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get a document1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a document1": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Get a document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a document": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store2",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Trigger2": {
+      "main": [
+        [
+          {
+            "node": "Get a document2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a document2": {
+      "main": [
+        [
+          {
+            "node": "Split Out2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out2": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI3": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store3",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Split Out3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Trigger3": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI4": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store4",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1a860d27f85ac51a41ae6c56fa2f6e297699e550ade23b587ddbb0966ffd8097"
+  }
+}
